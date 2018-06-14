@@ -21,12 +21,15 @@ local_ted_main <- read_csv("03-formatos-arquivos/data/ted_main.csv")
 
 head(local_ted_main)
 
+# Lê o arquivo problemático com a biblioteca local do R, remove todos as quebras de linha, vírgulas
+# e gera um novo arquivo sem as partes problemáticos
 local_ted_main %>%
   mutate(url = str_replace_all(url, "\n", "")) %>%
   mutate_if(is_character, ~ str_replace_all(.x, ",", " ")) %>%
   select(-ratings, -related_talks, -tags) %>%
   write_csv("03-formatos-arquivos/data/ted_main_no_json.csv")
 
+# Agora consegue ler o arquivo CSV com a lib do spark
 ted_main <- spark_read_csv( sc, name = "ted_main", path = "03-formatos-arquivos/data/ted_main_no_json.csv"
                             , header = TRUE, infer_schema = TRUE, memory = FALSE )
 

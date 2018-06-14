@@ -5,7 +5,7 @@ install.packages( "nycflights13" )
 format( object.size(nycflights13::flights), "MB" )
 
 library(sparklyr)
-library(tidyverse)
+library(dbplyr)
 
 # Inicializa processo do Spark
 sc <- spark_connect(master = "local")

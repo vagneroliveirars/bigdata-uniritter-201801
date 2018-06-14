@@ -39,7 +39,7 @@ ratings_music %>%
 
 library(sparkavro)
 
-spark_write_avro(ratings_music, path = "03-formatos-arquivos/data/subset_meta_Digital_Music.avro", options = list(compression = "snappy"))
+spark_write_avro(ratings_music, path = "03-formatos-arquivos/data/subset_meta_Digital_Music_2.avro", options = list(compression = "snappy"))
 
 spark_disconnect(sc)
 spark_disconnect_all()

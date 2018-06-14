@@ -1,5 +1,5 @@
 library(sparklyr)
-library(tidyverse)
+library(dplyr)
 
 # Inicializa processo do Spark (ver processo Java em monitor de tarefas / monitor de atividades)
 sc <- spark_connect(master = "local")
@@ -11,14 +11,30 @@ flights_tbl <- copy_to( sc, nycflights13::flights, "flights" )
 spark_web(sc)
 
 # Uma operação simples de média.
+# Média de atraso de partida (dep_delay)
+nycflights13::flights %>% 
+  summarise(mean(dep_delay, na.rm = TRUE))
 
 # Criar uma operação com dplyr para calcular a média de atraso de partida (dep_delay) por companhia aérea (carrier) em nycflights13::flights
+nycflights13::flights %>% 
+  group_by(carrier) %>% 
+  summarise(median = mean(dep_delay, na.rm = TRUE))
 
 # Repetir esta mesma operação com o flights_tbl
+flights_tbl %>% 
+  group_by(carrier) %>% 
+  summarise(median = mean(dep_delay, na.rm = TRUE)) %>% 
+  ungroup()
 
 # Agora atribuir o resultado da operação sparklyr para uma variável chamada media_atraso_partidas_companhias
+media_atraso_partidas_companhias <- 
+  flights_tbl %>% 
+  group_by(carrier) %>% 
+  summarise(median = mean(dep_delay, na.rm = TRUE)) %>% 
+  ungroup()
 
-tbl_atraso_medio <- sdf_register( media_atraso_partidas_companhias, name = "media_atraso" )
+tbl_atraso_medio <- 
+  sdf_register(media_atraso_partidas_companhias, name = "media_atraso" )
 
 # Persistindo (cache) em memória
 sdf_persist( tbl_atraso_medio, storage.level = "MEMORY_ONLY" )
